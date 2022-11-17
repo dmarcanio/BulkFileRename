@@ -38,6 +38,15 @@ class Window(QWidget, Ui_Window):
 
     def _setupUI(self):
         self.setupUi(self)
+        self._updateStateWhenNoFiles()
+
+    def _updateStateWhenNoFiles(self):
+        self._filesCount = len(self._files)
+        self.loadFilesButton.setEnabled(True)
+        self.loadFilesButton.setFocus(True)
+        self.renameFilesButton.setEnabled(False)
+        self.prefixEdit.clear()
+        self.prefixEdit.setEnabled(False)
 
     def _connectSignalsSlots(self):
         """Collect several signal and slot connections in a single place.
@@ -88,6 +97,7 @@ class Window(QWidget, Ui_Window):
         # Update state
         self._renamer.renamedFile.connect(self._updateStateWhenFileRenamed)
         self._renamer.progressed.connect(self._updateProgressBar)
+        self._renamer.finished.connect(self._updateStateWhenNoFiles)
         # Clean up
         self._renamer.finished.connect(self._thread.quit)
         self._renamer.finished.connect(self._renamer.deleteLater)
