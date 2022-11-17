@@ -55,6 +55,13 @@ class Window(QWidget, Ui_Window):
            """
         self.loadFilesButton.clicked.connect(self.loadFiles)
         self.renameFilesButton.clicked.connect(self.renameFiles)
+        self.prefixEdit.textChanged.connect(self._updateStateWhenReady)
+
+    def _updateStateWhenReady(self):
+        if self.prefixEdit.text():
+            self.renameFilesButton.setEnabled(True)
+        else:
+            self.renameFilesButton.setEnabled(False)
 
     def loadFiles(self):
         """ Load the files to be renamed. """
@@ -79,9 +86,19 @@ class Window(QWidget, Ui_Window):
                 self._files.append(Path(file))
                 self.srcFileList.addItem(file)  # add each file to selected file list widget
             self._filesCount = len(self._files)
+            self._updateStateWhenFilesLoaded()
+
+    def _updateStateWhenFilesLoaded(self):
+        self.prefixEdit.setEnabled(True)
+        self.prefixEdit.setFocus(True)
 
     def renameFiles(self):
         self._runRenamerThread()
+        self._updateStateWhileRenaming()
+
+    def _updateStateWhileRenaming(self):
+        self.loadFilesButton.setEnabled(False)
+        self.renameFilesButton.setEnabled(False)
 
     def _runRenamerThread(self):
         prefix = self.prefixEdit.text()
